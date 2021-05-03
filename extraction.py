@@ -1,6 +1,11 @@
 
 #import statements
 import csv
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
 #this should take in raceid and then return the year and circuit id
 def raceid_to_circuit(x):
@@ -72,6 +77,7 @@ circuit_info = [ 0 for x in range(74)]
 ###[driverID[raceID[fastest lap, fastest pit]]
 ###
 ##racer_info = ['NULL']* 843 #i forget what gets inserted here
+from scipy.stats import linregress
 LAPMAX=200000
 PITMAX=200000
 LAPCOUNT=0
@@ -112,11 +118,104 @@ for i in range (1,844):
     if avg_speed[i-1][5] > 0:
         avgs[i-1][1]=float(avg_speed[i-1][1]/avg_speed[i-1][5])
 print(avgs)
+##for i in avgs:
+##fig=plt.figure()
+##ax=fig.add_subplot(111)
+x=[]
+y=[]
+for i in range(1,844):
+    x=avgs[i-1][0]
+    y=avgs[i-1][1]
+    ##plt.subplot(111)
+    plt.plot(i,x,'o',ms=1.0,color='red')
+    plt.plot(i,y,'s',ms=1.0,color='blue')
+##plt.legend(loc='upper center')
+plt.title('average lap and average pit driver comparison')
+plt.xlabel('driver id')
+plt.ylabel('average times (ms)')
+plt.show()
+
+j=[0.0 for h in range(1,844)]
+k=[0.0 for g in range(1,844)]
+for i in range(1,844):
+    j[i-1]=avgs[i-1][0]
+    k[i-1]=avgs[i-1][1]
+plt.plot(j,k,'o',ms=1.0,color='red')
+plt.suptitle('average lap time vs average pit time')
+plt.xlabel('average lap time (ms)')
+plt.ylabel('average pit time (ms)')
+z=np.polyfit(j,k,1)
+e=np.poly1d(z)(j)
+slope,intercept,r_value,p_value,std_err=linregress(j,k)
+print("slope: %f, intercept: %f" %(slope,intercept))
+print("R-squared: %f" % r_value**2)
+plt.plot(j,e,'r',label='trend')
+plt.title("y=%.6fx+%.6f"%(z[0],z[1]))
+plt.show()
+
+##KNN calculation test
+##X_train, X_test, y_train, y_test=train_test_split(j,k,test_size=0.25,random_state=0)
+##from sklearn.preprocessing import StandardScaler
+##sc = StandardScaler()
+##X_train=sc.fit_transform(X_train)
+##X_test=sc.transform(X_test)
+##from sklearn.neighbors import KNrighborsClassifier
+##classifier=KNeighborsClassifier(n_neighbors=2)
+##classifiier.fit(X_train, y_train)
+##y_pred=classifier.predict(X_test)
+##from sklearn.metrics import confusion_matrix
+##cm=confusion_matrix(y_test,y_pred)
+##print(cm)
+
+
+##fig=plt.figure()
+##ax=fig.add_subplot(111)   
+####ax.scatter(range(0,844),x,s=10,c='b',marker="s",label='avg lap')
+####ax.scatter(range(0,844),y,s=10,c='r',marker="o",label='avg pit')
+####plt.legend(loc='upper left');
+##ax.scatter(x,y,s=10,c='r',marker="o",label='avg pit')
+##plt.title('average lap vs average pit')
+##plt.xlabel('average lap')
+##plt.ylabel('average pit')
+##plt.show()
+    
 fast_time= [ [0,0] for x in range(844) ] #fastest lap and pit times for each driver
 for i in range(1,844):
     fast_time[i-1][0]=avg_speed[i-1][3]
     fast_time[i-1][1]=avg_speed[i-1][2]
 print(fast_time)
+
+p=[0.0 for h in range(1,844)]
+q=[0.0 for g in range(1,844)]
+for i in range(1,844):
+    p[i-1]=fast_time[i-1][0]
+    q[i-1]=fast_time[i-1][1]
+plt.plot(q,p,'o',ms=1.0,color='red')
+plt.suptitle('fastest lap vs fastest pit')
+plt.ylabel('max lap time (ms)')
+plt.xlabel('max pit time (ms)')
+z=np.polyfit(q,p,1)
+e=np.poly1d(z)(q)
+slope,intercept,r_value,p_value,std_err=linregress(q,p)
+print("slope: %f, intercept: %f" %(slope,intercept))
+print("R-squared: %f" % r_value**2)
+plt.plot(q,e,'r',label='trend')
+plt.title("y=%.6fx+%.6f"%(z[0],z[1]))
+plt.show()
+
+
+x=[0.0 for h in range(1,844)]
+y=[0.0 for g in range(1,844)]
+for i in range(1,844):
+    x[i-1]=fast_time[i-1][0]
+    y[i-1]=fast_time[i-1][1]
+plt.plot(range(1,844),x,'o',ms=1.0,color='red',label='lap max')
+plt.plot(range(1,844),y,'s',ms=1.0,color='blue',label='pit max')
+plt.title('lap max and pit max driver comparison')
+plt.legend(loc='upper left')
+plt.xlabel('driverid')
+plt.ylabel('max times (ms)')
+plt.show()
 # [driverID[year number[
 #raceid=[[LAPMAX,PITMAX]]*1009
 raceid=[ [LAPMAX,PITMAX] for x in range(1010) ]
@@ -153,4 +252,30 @@ for i in range(1,844):
 print(amount)
 
 print(raceid)
+p=[0.0 for h in range(1,844)]
+q=[0.0 for g in range(1,844)]
+for i in range(1,844):
+    p[i-1]=raceid[i-1][0]
+    q[i-1]=raceid[i-1][1]
+plt.plot(q,p,'o',ms=1.0,color='red')
+plt.suptitle('average lap vs average pit')
+plt.ylabel('max lap time (ms)')
+plt.xlabel('max pit time (ms)')
+z=np.polyfit(j,k,1)
+plt.title("y=%.6fx+%.6f"%(z[0],z[1]))
+plt.show()
+
+
+x=[0.0 for h in range(1,844)]
+y=[0.0 for g in range(1,844)]
+for i in range(1,844):
+    x[i-1]=raceid[i-1][0]
+    y[i-1]=raceid[i-1][1]
+plt.plot(range(1,844),x,'o',ms=1.0,color='red',label='lap max')
+plt.plot(range(1,844),y,'s',ms=1.0,color='blue',label='pit max')
+plt.title('lap max and pit max driver comparison')
+plt.legend(loc='upper left')
+plt.xlabel('driverid')
+plt.ylabel('max times (ms)')
+plt.show()
 
